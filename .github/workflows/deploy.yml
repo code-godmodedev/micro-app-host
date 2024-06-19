@@ -62,13 +62,12 @@ jobs:
           # Construct website URL
           WEBSITE_URL="http://$BUCKET.s3-website-$REGION.amazonaws.com/$VERSION/"
 
-          echo "S3 Website URL: $WEBSITE_URL"
-          echo "::set-output name=website_url::$WEBSITE_URL"
+          echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
 
       - name: Update RELEASE.md
         run: |
           echo "## Release ${{ inputs.new_version }}" > RELEASE.md
-          echo "\nS3 Website URL: ${{ steps.get_s3_url.outputs.website_url }}" >> RELEASE.md
+          echo "\nS3 Website URL: ${{ env.website_url }}" >> RELEASE.md
           cat RELEASE.md
           git add RELEASE.md
           git commit -m "Update RELEASE.md for version ${{ inputs.new_version }}"
