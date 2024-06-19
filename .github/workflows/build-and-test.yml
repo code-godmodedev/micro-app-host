@@ -1,6 +1,10 @@
 name: Build and Test
 
-on: workflow_call
+on:
+  push:
+    branches:
+      - develop
+      - master
 
 jobs:
   build_and_test:
@@ -20,5 +24,11 @@ jobs:
       - name: Build project
         run: yarn run build
 
-    #   - name: Run tests
-    #     run: yarn test
+      #   - name: Run tests
+      #     run: yarn test
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
