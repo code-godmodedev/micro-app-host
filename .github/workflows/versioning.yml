@@ -31,11 +31,9 @@ jobs:
       - name: Determine version increment
         id: determine_increment
         run: |
-          feat="feat"
-          fix="fix"
-          if [[ ${{ env.commit_message }} == *${feat}* ]]; then
+          if [[ ${{ env.commit_message }} == *feat* ]]; then
             echo "increment=major" >> $GITHUB_ENV
-          elif [[ ${{ env.commit_message }} == *${fix}* ]]; then
+          elif [[ ${{ env.commit_message }} == *fix* ]]; then
             echo "increment=minor" >> $GITHUB_ENV
           else
             echo "increment=patch" >> $GITHUB_ENV
