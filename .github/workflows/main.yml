@@ -1,0 +1,23 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+
+jobs:
+  build_and_test:
+    uses: ./.github/workflows/build-and-test.yml
+
+  versioning:
+    needs: build_and_test
+    uses: ./.github/workflows/versioning.yml
+
+  deploy:
+    needs: versioning
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ github.ref == 'refs/heads/develop' && 'development' || 'production' }}
+      new_version: ${{ needs.versioning.outputs.new_version }}
+    secrets: inherit

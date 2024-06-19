@@ -1,0 +1,75 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      new_version:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    environment:
+      name: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload dist folder to S3
+        run: |
+          BUCKET=${{ secrets.S3_BUCKET }}
+          aws s3 sync dist/ s3://$BUCKET/${{ inputs.new_version }} --delete
+
+      - name: Get S3 website URL and output
+        id: get_s3_url
+        run: |
+          BUCKET=${{ secrets.S3_BUCKET }}
+          VERSION=${{ inputs.new_version }}
+
+          # Get region
+          REGION=$(aws s3api get-bucket-location --bucket $BUCKET --query 'LocationConstraint' --output text)
+          if [ "$REGION" == "None" ]; then
+            REGION="us-east-1"
+          fi
+
+          # Construct website URL
+          WEBSITE_URL="http://$BUCKET.s3-website-$REGION.amazonaws.com/$VERSION/"
+
+          echo "S3 Website URL: $WEBSITE_URL"
+          echo "::set-output name=website_url::$WEBSITE_URL"
+
+      - name: Update RELEASE.md
+        run: |
+          echo "## Release ${{ inputs.new_version }}" > RELEASE.md
+          echo "\nS3 Website URL: ${{ steps.get_s3_url.outputs.website_url }}" >> RELEASE.md
+          cat RELEASE.md
+          git add RELEASE.md
+          git commit -m "Update RELEASE.md for version ${{ inputs.new_version }}"
+          git push origin main
