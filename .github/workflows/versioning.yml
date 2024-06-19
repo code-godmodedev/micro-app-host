@@ -9,7 +9,7 @@ jobs:
       new_version: ${{ steps.increment_version.outputs.new_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Ensure VERSION.txt exists
         id: ensure_version_file
