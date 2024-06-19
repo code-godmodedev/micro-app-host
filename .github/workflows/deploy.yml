@@ -54,7 +54,7 @@ jobs:
 
       - name: Create S3 bucket if it does not exist
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
           if ! aws s3api list-buckets --query "Buckets[?Name=='$BUCKET_NAME'].Name" --output text | grep -q "$BUCKET_NAME"; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
             aws s3api put-public-access-block --bucket "$BUCKET_NAME" --public-access-block-configuration '{
@@ -67,11 +67,20 @@ jobs:
               "Version": "2012-10-17",
               "Statement": [
                 {
-                  "Sid": "PublicReadGetObject",
+                  "Sid": "PublicAccessPolicy",
                   "Effect": "Allow",
                   "Principal": "*",
-                  "Action": "s3:GetObject",
-                  "Resource": "arn:aws:s3:::'"$BUCKET_NAME"'/*"
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:PutObject",
+                    "s3:DeleteObject",
+                    "s3:ListBucketMultipartUploads"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::'"$BUCKET_NAME"'",
+                    "arn:aws:s3:::'"$BUCKET_NAME"'/*"
+                  ]
                 }
               ]
             }'
@@ -80,13 +89,13 @@ jobs:
 
       - name: Upload dist folder to S3
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
           aws s3 sync dist/ s3://$BUCKET_NAME/${{ inputs.new_version }} --delete
 
       - name: Get S3 website URL and output
         id: get_s3_url
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
           VERSION=${{ inputs.new_version }}
 
           # Get region
@@ -124,11 +133,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compress dist folder
+        run: zip -r dist.zip dist/
+
       - name: Upload dist folder to GitHub Release
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/
+          asset_path: dist.zip
           asset_name: dist.zip
           asset_content_type: application/zip
         env:
