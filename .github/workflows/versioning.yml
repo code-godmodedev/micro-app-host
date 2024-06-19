@@ -25,16 +25,15 @@ jobs:
       - name: Get commit message
         id: get_commit_message
         run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B | tr -d '\n')
+          COMMIT_MSG=$(git log -1 --pretty=%B | tr -d '\n' | sed 's/"/\\"/g')
           echo "commit_message=$COMMIT_MSG" >> $GITHUB_ENV
 
       - name: Determine version increment
         id: determine_increment
         run: |
-          commit_message=$(echo ${{ env.commit_message }})
-          if [[ "$commit_message" == feat* ]]; then
+          if [[ "${{ env.commit_message }}" == feat* ]]; then
             echo "increment=major" >> $GITHUB_ENV
-          elif [[ "$commit_message" == fix* ]]; then
+          elif [[ "${{ env.commit_message }}" == fix* ]]; then
             echo "increment=minor" >> $GITHUB_ENV
           else
             echo "increment=patch" >> $GITHUB_ENV
@@ -42,12 +41,10 @@ jobs:
       - name: Increment version
         id: increment_version
         run: |
-          version=$(echo ${{ env.version }})
-          increment=$(echo ${{ env.increment }})
-          IFS='.' read -r -a version_parts <<< "$version"
-          if [[ "$increment" == "major" ]]; then
+          IFS='.' read -r -a version_parts <<< "${{ env.version }}"
+          if [[ "${{ env.increment }}" == "major" ]]; then
             new_version=$((version_parts[0] + 1)).0.0
-          elif [[ "$increment" == "minor" ]]; then
+          elif [[ "${{ env.increment }}" == "minor" ]]; then
             new_version=${version_parts[0]}.$((version_parts[1] + 1)).0
           else
             new_version=${version_parts[0]}.${version_parts[1]}.$((version_parts[2] + 1))
@@ -56,12 +53,12 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Update version file
-        run: echo "$new_version" > VERSION.txt
+        run: echo "${{ env.new_version }}" > VERSION.txt
 
       - name: Commit version increment
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add VERSION.txt
-          git commit -m "Increment version to $new_version"
+          git commit -m "Increment version to ${{ env.new_version }}"
           git push origin main
