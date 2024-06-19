@@ -31,9 +31,11 @@ jobs:
       - name: Determine version increment
         id: determine_increment
         run: |
-          if [[ "${{ env.commit_message }}" == feat* ]]; then
+          feat='feat'
+          fix='fix'
+          if [[ ${{ env.commit_message }} == *${feat}* ]]; then
             echo "increment=major" >> $GITHUB_ENV
-          elif [[ "${{ env.commit_message }}" == fix* ]]; then
+          elif [[ ${{ env.commit_message }} == *${fix}* ]]; then
             echo "increment=minor" >> $GITHUB_ENV
           else
             echo "increment=patch" >> $GITHUB_ENV
@@ -42,9 +44,9 @@ jobs:
         id: increment_version
         run: |
           IFS='.' read -r -a version_parts <<< "${{ env.version }}"
-          if [[ "${{ env.increment }}" == "major" ]]; then
+          if [[ ${{ env.increment }} == "major" ]]; then
             new_version=$((version_parts[0] + 1)).0.0
-          elif [[ "${{ env.increment }}" == "minor" ]]; then
+          elif [[ ${{ env.increment }} == "minor" ]]; then
             new_version=${version_parts[0]}.$((version_parts[1] + 1)).0
           else
             new_version=${version_parts[0]}.${version_parts[1]}.$((version_parts[2] + 1))
