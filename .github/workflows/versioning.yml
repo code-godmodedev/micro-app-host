@@ -65,3 +65,6 @@ jobs:
           git commit -m "Increment version to ${{ env.new_version }}"
           git pull origin $(echo "$BRANCH_NAME") --rebase
           git push origin HEAD:$BRANCH_NAME
+
+      - name: Write new version to file
+        run: echo "NEW_VERSION=${{ env.new_version }}" >> $GITHUB_ENV
