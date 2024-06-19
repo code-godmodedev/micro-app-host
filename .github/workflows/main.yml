@@ -18,10 +18,17 @@ jobs:
     needs: build_and_test
     uses: ./.github/workflows/versioning.yml
 
-  deploy:
+  deploy_to_s3:
     needs: versioning
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy-to-s3.yml
     with:
       environment: ${{ github.ref == 'refs/heads/develop' && 'development' || 'production' }}
       new_version: ${{ needs.versioning.outputs.new_version }}
+    secrets: inherit
+
+  create_release:
+    needs: deploy_to_s3
+    uses: ./.github/workflows/create-release.yml
+    with:
+      new_version: ${{ needs.deploy_to_s3.outputs.new_version }}
     secrets: inherit
