@@ -80,7 +80,7 @@ jobs:
       - name: Get S3 website URL and output
         id: get_s3_url
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v1"
           VERSION=${{ inputs.new_version }}
 
           # Get region
