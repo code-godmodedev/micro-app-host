@@ -116,7 +116,7 @@ jobs:
           cat RELEASE.md
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git pull origin $(echo "${GITHUB_REF#refs/heads/}") --rebase
           git add RELEASE.md
           git commit -m "Update RELEASE.md for version ${{ inputs.new_version }}"
+          git pull origin $(echo "${GITHUB_REF#refs/heads/}") --rebase
           git push origin HEAD:$(echo "${GITHUB_REF#refs/heads/}")
