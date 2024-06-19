@@ -25,15 +25,15 @@ jobs:
       - name: Get commit message
         id: get_commit_message
         run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
+          COMMIT_MSG=$(git log -1 --pretty=%B | tr -d '\n')
           echo "commit_message=$COMMIT_MSG" >> $GITHUB_ENV
 
       - name: Determine version increment
         id: determine_increment
         run: |
-          if [[ "$COMMIT_MSG" == feat* ]]; then
+          if [[ "$commit_message" == feat* ]]; then
             echo "increment=major" >> $GITHUB_ENV
-          elif [[ "$COMMIT_MSG" == fix* ]]; then
+          elif [[ "$commit_message" == fix* ]]; then
             echo "increment=minor" >> $GITHUB_ENV
           else
             echo "increment=patch" >> $GITHUB_ENV
