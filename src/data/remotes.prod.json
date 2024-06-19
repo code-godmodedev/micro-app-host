@@ -1,0 +1,12 @@
+[{
+    "app": "jsHost",
+    "remotes": [
+        {
+            "scope": "jsRemote",
+            "entry": "http://localhost:3001/mf-manifest.json",
+            "plugins": [
+                "jsRemote/RemoteComponent", "jsRemote/AnotherComponent"
+            ]
+        }
+    ]
+}]
