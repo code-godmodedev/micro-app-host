@@ -105,14 +105,14 @@ jobs:
           fi
 
           # Construct website URL
-          WEBSITE_URL="http://$BUCKET_NAME.s3-website-$REGION.amazonaws.com/$VERSION/"
+          WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
 
       - name: Update RELEASE.md
         run: |
           echo "## Release ${{ inputs.new_version }}" > RELEASE.md
-          echo "\nS3 Website URL: ${{ env.website_url }}" >> RELEASE.md
+          echo "S3 Website URL: ${{ env.website_url }}" >> RELEASE.md
           cat RELEASE.md
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
