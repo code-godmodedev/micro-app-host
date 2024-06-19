@@ -49,8 +49,14 @@ jobs:
       - name: Create S3 bucket if it does not exist
         run: |
           BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}"
-          if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
+          if ! aws s3api list-buckets --query "Buckets[?Name=='$BUCKET_NAME'].Name" --output text | grep -q "$BUCKET_NAME"; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
+            aws s3api put-public-access-block --bucket "$BUCKET_NAME" --public-access-block-configuration '{
+              "BlockPublicAcls": false,
+              "IgnorePublicAcls": false,
+              "BlockPublicPolicy": false,
+              "RestrictPublicBuckets": false
+            }'
             aws s3api put-bucket-policy --bucket "$BUCKET_NAME" --policy '{
               "Version": "2012-10-17",
               "Statement": [
