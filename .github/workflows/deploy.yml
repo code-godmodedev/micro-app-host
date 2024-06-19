@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload dist folder to S3
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v1"
           aws s3 sync dist/ s3://$BUCKET_NAME/${{ inputs.new_version }} --delete
 
       - name: Get S3 website URL and output
