@@ -1,6 +1,12 @@
 name: Versioning
 
-on: workflow_call
+on:
+  workflow_call:
+    # Map the workflow outputs to job outputs
+    outputs:
+      new_version:
+        description: "The first output string"
+        value: ${{ jobs.versioning.outputs.new_version }}
 
 jobs:
   versioning:
