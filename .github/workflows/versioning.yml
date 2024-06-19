@@ -61,6 +61,7 @@ jobs:
           BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git pull origin $(echo "$BRANCH_NAME") --rebase
           git add VERSION.txt
           git commit -m "Increment version to ${{ env.new_version }}"
           git push origin HEAD:$BRANCH_NAME
