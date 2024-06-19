@@ -20,5 +20,11 @@ jobs:
       - name: Build project
         run: yarn run build
 
-    #   - name: Run tests
-    #     run: yarn test
+      #   - name: Run tests
+      #     run: yarn test
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

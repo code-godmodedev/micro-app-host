@@ -16,7 +16,7 @@ jobs:
 
     permissions:
       id-token: write
-      contents: read
+      contents: write
 
     environment:
       name: ${{ inputs.environment }}
@@ -24,6 +24,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -101,4 +107,29 @@ jobs:
           cat RELEASE.md
           git add RELEASE.md
           git commit -m "Update RELEASE.md for version ${{ inputs.new_version }}"
-          git push origin main
+          BRANCH_NAME=$(echo "${GITHUB_REF#refs/heads/}")
+          git push origin HEAD:$BRANCH_NAME
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v4
+        with:
+          tag_name: ${{ inputs.new_version }}
+          release_name: Release ${{ inputs.new_version }}
+          body: |
+            ## Changes
+            See [RELEASE.md](./RELEASE.md)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload dist folder to GitHub Release
+        uses: actions/upload-release-asset@v4
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/
+          asset_name: dist.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
