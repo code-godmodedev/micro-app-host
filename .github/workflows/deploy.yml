@@ -48,7 +48,7 @@ jobs:
 
       - name: Create S3 bucket if it does not exist
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v1"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
           if ! aws s3api list-buckets --query "Buckets[?Name=='$BUCKET_NAME'].Name" --output text | grep -q "$BUCKET_NAME"; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
             aws s3api put-public-access-block --bucket "$BUCKET_NAME" --public-access-block-configuration '{
@@ -74,13 +74,13 @@ jobs:
 
       - name: Upload dist folder to S3
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v1"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
           aws s3 sync dist/ s3://$BUCKET_NAME/${{ inputs.new_version }} --delete
 
       - name: Get S3 website URL and output
         id: get_s3_url
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v1"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v2"
           VERSION=${{ inputs.new_version }}
 
           # Get region
