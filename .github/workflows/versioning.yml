@@ -31,6 +31,7 @@ jobs:
       - name: Determine version increment
         id: determine_increment
         run: |
+          commit_message=$(echo ${{ env.commit_message }})
           if [[ "$commit_message" == feat* ]]; then
             echo "increment=major" >> $GITHUB_ENV
           elif [[ "$commit_message" == fix* ]]; then
@@ -41,6 +42,8 @@ jobs:
       - name: Increment version
         id: increment_version
         run: |
+          version=$(echo ${{ env.version }})
+          increment=$(echo ${{ env.increment }})
           IFS='.' read -r -a version_parts <<< "$version"
           if [[ "$increment" == "major" ]]; then
             new_version=$((version_parts[0] + 1)).0.0
