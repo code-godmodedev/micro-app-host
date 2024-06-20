@@ -114,6 +114,7 @@ jobs:
           WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
+          echo "s3_website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
 
       - name: Set output
         id: set_output
