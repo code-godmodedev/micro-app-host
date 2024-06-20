@@ -13,7 +13,8 @@ on:
 jobs:
   deploy_to_s3:
     runs-on: ubuntu-latest
-
+    outputs:
+      s3_website_url: ${{ steps.set_output.outputs.new_version }}
     permissions:
       id-token: write
       contents: write
@@ -108,3 +109,7 @@ jobs:
           WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
+
+      - name: Set output
+        id: set_output
+        run: echo "::set-output name=s3_website_url::${{ env.website_url }}"

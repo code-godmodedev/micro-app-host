@@ -6,6 +6,9 @@ on:
       new_version:
         required: true
         type: string
+      s3_website_url:
+        required: true
+        type: string
 
 jobs:
   create_release:
@@ -22,20 +25,12 @@ jobs:
       - name: Generate release notes
         id: generate_release_notes
         run: |
-          echo "## Release ${{ inputs.new_version }}" > release_notes.md
-          echo "S3 Website URL: ${{ env.website_url }}" >> release_notes.md
-          echo "" >> release_notes.md
-          git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> release_notes.md
-          echo "" >> release_notes.md
-          cat release_notes.md
-          RELEASE_NOTES=$(cat release_notes.md)
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "$RELEASE_NOTES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Update RELEASE.md
-        run: |
-          cat release_notes.md RELEASE.md > new_release.md
+          echo "## Release ${{ inputs.new_version }}" > new_release.md
+          echo "S3 Website URL: ${{ inputs.s3_website_url }}" >> new_release.md
+          echo "" >> new_release.md
+          git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> new_release.md
+          echo "" >> new_release.md
+          cat RELEASE.md >> new_release.md
           mv new_release.md RELEASE.md
           cat RELEASE.md
           git config --global user.name 'github-actions[bot]'
