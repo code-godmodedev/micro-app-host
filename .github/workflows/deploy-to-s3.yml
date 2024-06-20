@@ -9,6 +9,11 @@ on:
       new_version:
         required: true
         type: string
+    outputs:
+      s3_website_url:
+        description: "The first output string"
+        value: ${{ jobs.deploy_to_s3.outputs.new_version }}
+
 
 jobs:
   deploy_to_s3:
