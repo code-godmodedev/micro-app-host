@@ -12,7 +12,7 @@ on:
     outputs:
       s3_website_url:
         description: "The first output string"
-        value: ${{ jobs.deploy_to_s3.outputs.new_version }}
+        value: ${{ jobs.deploy_to_s3.outputs.s3_website_url }}
 
 
 jobs:
