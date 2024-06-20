@@ -3,6 +3,9 @@ name: Create Release
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       new_version:
         required: true
         type: string
@@ -17,6 +20,9 @@ jobs:
     permissions:
       id-token: write
       contents: write
+
+    environment:
+      name: ${{ inputs.environment }}
 
     steps:
       - name: Checkout code
