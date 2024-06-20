@@ -109,6 +109,6 @@ jobs:
           # VERSION=${{ inputs.new_version }}
 
           # Construct website URL
-          WEBSITE_URL="http://${{ env.BUCKET_NAME }}.s3-website.${{ env.REGION }}.amazonaws.com/${{ env.VERSION }}/"
+          WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
