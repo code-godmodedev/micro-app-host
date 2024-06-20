@@ -26,7 +26,7 @@ jobs:
         id: generate_release_notes
         run: |
           echo "## Release ${{ inputs.new_version }}" > release_notes.md
-          echo "S3 Website URL: ${{ env.website_url }}" >> release_notes.md
+          echo "S3 Website URL: ${{ inputs.s3_website_url }}" >> release_notes.md
           echo "" >> release_notes.md
           # Get all commits for the new release
           git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> release_notes.md
