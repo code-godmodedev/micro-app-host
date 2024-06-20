@@ -10,15 +10,15 @@ on:
         required: true
         type: string
     outputs:
-      s3_website_url:
+      link:
         description: "The S3 website URL"
-        value: ${{ jobs.deploy_to_s3.outputs.s3_website_url }}
+        value: ${{ jobs.deploy_to_s3.outputs.link }}
 
 jobs:
   deploy_to_s3:
     runs-on: ubuntu-latest
     outputs:
-      s3_website_url: ${{ env.website_url }}
+      link: ${{ env.website_url }}
     permissions:
       id-token: write
       contents: write

@@ -31,5 +31,5 @@ jobs:
     uses: ./.github/workflows/create-release.yml
     with:
       new_version: ${{ needs.versioning.outputs.new_version }}
-      s3_website_url: ${{ needs.deploy_to_s3.outputs.s3_website_url }}
+      link: ${{ needs.deploy_to_s3.outputs.link }}
     secrets: inherit
