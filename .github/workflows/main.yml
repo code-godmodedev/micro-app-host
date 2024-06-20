@@ -27,9 +27,7 @@ jobs:
     secrets: inherit
 
   create_release:
-    needs:
-      - versioning
-      - deploy_to_s3
+    needs: [versioning, deploy_to_s3]
     uses: ./.github/workflows/create-release.yml
     with:
       new_version: ${{ needs.versioning.outputs.new_version }}

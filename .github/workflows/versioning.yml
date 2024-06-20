@@ -12,7 +12,7 @@ jobs:
   versioning:
     runs-on: ubuntu-latest
     outputs:
-      new_version: ${{ steps.set_output.outputs.new_version }}
+      new_version: ${{ env.new_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
