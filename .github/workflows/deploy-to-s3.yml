@@ -100,19 +100,15 @@ jobs:
 
       - name: Get S3 website URL and output
         id: get_s3_url
+        env: 
+          BUCKET_NAME: ${{ env.project_name }}-${{ inputs.environment }}-v3
+          VERSION: ${{ inputs.new_version }}
+          REGION: ${{ secrets.AWS_REGION }}
         run: |
-          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
-          VERSION=${{ inputs.new_version }}
-
-          # Get region
-          REGION=$(aws s3api get-bucket-location --bucket $BUCKET_NAME --query 'LocationConstraint' --output text)
-          if [ "$REGION" == "None" ]; then
-            REGION="us-east-1"
-          fi
+          # BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
+          # VERSION=${{ inputs.new_version }}
 
           # Construct website URL
-          WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
+          WEBSITE_URL="http://${{ env.BUCKET_NAME }}.s3-website.${{ env.REGION }}.amazonaws.com/${{ env.VERSION }}/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
-          echo "s3_website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
-          echo "::set-output name=s3_website_url::$WEBSITE_URL"
