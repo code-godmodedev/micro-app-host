@@ -29,7 +29,7 @@ jobs:
           echo "S3 Website URL: ${{ env.website_url }}" >> release_notes.md
           echo "" >> release_notes.md
           # Get all commits for the new release
-          git log --merges --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> release_notes.md
+          git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> release_notes.md
           echo "" >> release_notes.md
           cat release_notes.md
           RELEASE_NOTES=$(cat release_notes.md)
