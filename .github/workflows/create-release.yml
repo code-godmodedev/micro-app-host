@@ -19,6 +19,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Update RELEASE.md
+        run: |
+          echo "## Release ${{ inputs.new_version }}" > new_release.md
+          echo "S3 Website URL: ${{ env.website_url }}" >> new_release.md
+          echo "" >> new_release.md
+          git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> new_release.md
+          echo "" >> new_release.md
+          cat RELEASE.md >> new_release.md
+          mv new_release.md RELEASE.md
+          cat RELEASE.md
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add RELEASE.md
+          git commit -m "Update RELEASE.md for version ${{ inputs.new_version }}"
+          git pull origin $(echo "${GITHUB_REF#refs/heads/}") --rebase
+          git push origin HEAD:$(echo "${GITHUB_REF#refs/heads/}")
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -27,7 +44,7 @@ jobs:
           release_name: Release ${{ inputs.new_version }}
           body: |
             ## Changes
-            See [RELEASE.md](./RELEASE.md)
+            $(cat RELEASE.md)
           draft: false
           prerelease: false
         env:
