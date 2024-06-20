@@ -30,6 +30,7 @@ jobs:
     needs: [versioning, deploy_to_s3]
     uses: ./.github/workflows/create-release.yml
     with:
+      environment: ${{ github.ref == 'refs/heads/develop' && 'development' || 'production' }}
       new_version: ${{ needs.versioning.outputs.new_version }}
-      link: ${{ needs.deploy_to_s3.outputs.link }}
+      project_name: ${{ needs.deploy_to_s3.outputs.project_name }}
     secrets: inherit

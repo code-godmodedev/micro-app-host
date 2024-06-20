@@ -22,11 +22,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get S3 website URL and output
+        id: get_s3_url
+        env: 
+          BUCKET_NAME: ${{ inputs.project_name }}-${{ inputs.environment }}-v3
+          VERSION: ${{ inputs.new_version }}
+          REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          # BUCKET_NAME="${{ inputs.project_name }}-${{ inputs.environment }}-v3"
+          # VERSION=${{ inputs.new_version }}
+
+          # Construct website URL
+          WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
+
+          echo "link=$WEBSITE_URL" >> $GITHUB_ENV
+
       - name: Generate release notes
         id: generate_release_notes
         run: |
           echo "## Release ${{ inputs.new_version }}" > release_notes.md
-          echo "S3 Website URL: ${{ inputs.link }}" >> release_notes.md
+          echo "S3 Website URL: ${{ env.link }}" >> release_notes.md
           echo "" >> release_notes.md
           # Get all commits for the new release
           git log --pretty=format:"* %s" $(git describe --tags --abbrev=0 @^)..@ >> release_notes.md
