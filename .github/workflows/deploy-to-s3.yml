@@ -11,15 +11,14 @@ on:
         type: string
     outputs:
       s3_website_url:
-        description: "The first output string"
+        description: "The S3 website URL"
         value: ${{ jobs.deploy_to_s3.outputs.s3_website_url }}
-
 
 jobs:
   deploy_to_s3:
     runs-on: ubuntu-latest
     outputs:
-      s3_website_url: ${{ steps.set_output.outputs.new_version }}
+      s3_website_url: ${{ steps.set_output.outputs.s3_website_url }}
     permissions:
       id-token: write
       contents: write
@@ -114,8 +113,4 @@ jobs:
           WEBSITE_URL="http://$BUCKET_NAME.s3-website.$REGION.amazonaws.com/$VERSION/"
 
           echo "website_url=$WEBSITE_URL" >> $GITHUB_ENV
-          echo "s3_website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
-
-      - name: Set output
-        id: set_output
-        run: echo "::set-output name=s3_website_url::${{ env.website_url }}"
+          echo "::set-output name=s3_website_url::$WEBSITE_URL"
