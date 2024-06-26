@@ -3,7 +3,7 @@
     "remotes": [
         {
             "scope": "jsRemote",
-            "entry": "http://micro-app-remote-development-v3.s3-website.ap-south-1.amazonaws.com/0.0.4/mf-manifest.json"
+            "entry": "http://micro-app-remote-development-v3.s3-website.ap-south-1.amazonaws.com/0.0.5/mf-manifest.json"
         },
         {
             "scope": "jsRemoteTwo",
