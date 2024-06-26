@@ -1324,10 +1324,10 @@ globalthis@^1.0.3:
     define-properties "^1.2.1"
     gopd "^1.0.1"
 
-gmd-mf-widget-loader@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/gmd-mf-widget-loader/-/gmd-mf-widget-loader-1.10.0.tgz#ce88c7b043b5d30dde7d54a3acff0385af15aa93"
-  integrity sha512-demf8vVaZD3hBrCFsxiXXbTYTFNYHEKgw5fIz9sJsCbLHCpSGz8rTpRGgeHHOZsJ+5MAUtyykBmbkFrZn/rd2g==
+gmd-mf-widget-loader@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/gmd-mf-widget-loader/-/gmd-mf-widget-loader-1.11.0.tgz#2c36abff34472349badd36372323f6f08a658e45"
+  integrity sha512-JWG1zRISRxzOF4OurIzTys8VAHu4p8n8EuKLqj9vYM2e59UiTGyCz5IMNkVITGfxD2Ml2z5qG16r8f7iY4pV2A==
   dependencies:
     "@babel/polyfill" "^7.12.1"
     "@module-federation/enhanced" "^0.1.21"
