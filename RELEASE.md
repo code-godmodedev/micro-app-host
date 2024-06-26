@@ -1,3 +1,7 @@
+## Release 0.0.40
+S3 Website URL: http://micro-app-host-development-v3.s3-website.ap-south-1.amazonaws.com/0.0.40/
+
+
 ## Release 0.0.39
 S3 Website URL: http://micro-app-host-development-v3.s3-website.ap-south-1.amazonaws.com/0.0.39/
 
