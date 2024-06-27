@@ -39,7 +39,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install AWS CLI
         run: |
@@ -98,9 +98,101 @@ jobs:
           BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
           aws s3 sync dist/ s3://$BUCKET_NAME/${{ inputs.new_version }} --delete
 
+      - name: Check existing CloudFront distribution
+        id: check_distribution
+        run: |
+          EXISTING_DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.s3_bucket }}.s3-website.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+          echo "distribution_id=$EXISTING_DISTRIBUTION_ID" >> $GITHUB_ENV
+
+      - name: Create CloudFront distribution if it does not exist
+        if: env.distribution_id == ''
+        run: |
+          ORIGIN_ID="${{ inputs.s3_bucket }}-origin"
+          ORIGIN_PATH="/${{ inputs.new_version }}"
+          S3_WEBSITE_DOMAIN="$BUCKET_NAME.s3-website.${{ secrets.AWS_REGION }}.amazonaws.com"
+          DISTRIBUTION_CONFIG=$(cat <<EOF
+          {
+            "CallerReference": "${{ github.run_id }}",
+            "Comment": "Distribution for $S3_WEBSITE_DOMAIN",
+            "Origins": {
+              "Quantity": 1,
+              "Items": [
+                {
+                  "Id": "$ORIGIN_ID",
+                  "DomainName": "$S3_WEBSITE_DOMAIN",
+                  "OriginPath": "$ORIGIN_PATH",
+                  "CustomOriginConfig": {
+                    "HTTPPort": 80,
+                    "HTTPSPort": 443,
+                    "OriginProtocolPolicy": "http-only"
+                  }
+                }
+              ]
+            },
+            "DefaultCacheBehavior": {
+              "TargetOriginId": "$ORIGIN_ID",
+              "ViewerProtocolPolicy": "redirect-to-https",
+              "AllowedMethods": {
+                "Quantity": 2,
+                "Items": ["HEAD", "GET"],
+                "CachedMethods": {
+                  "Quantity": 2,
+                  "Items": ["HEAD", "GET"]
+                }
+              },
+              "ForwardedValues": {
+                "QueryString": false,
+                "Cookies": {
+                  "Forward": "none"
+                }
+              },
+              "MinTTL": 0
+            },
+            "Comment": "React App CloudFront Distribution",
+            "Enabled": true,
+            "PriceClass": "PriceClass_All",
+            "ViewerCertificate": {
+              "CloudFrontDefaultCertificate": true
+            },
+            "DefaultRootObject": "index.html",
+            "CustomErrorResponses": {
+              "Quantity": 1,
+              "Items": [
+                {
+                  "ErrorCode": 404,
+                  "ResponsePagePath": "/index.html",
+                  "ResponseCode": "200",
+                  "ErrorCachingMinTTL": 0
+                }
+              ]
+            }
+          }
+          EOF
+          )
+          aws cloudfront create-distribution --distribution-config "$DISTRIBUTION_CONFIG"
+
+      - name: Update existing CloudFront distribution
+        if: env.distribution_id != ''
+        run: |
+          DISTRIBUTION_CONFIG=$(aws cloudfront get-distribution-config --id ${{ env.distribution_id }})
+          ETAG=$(echo $DISTRIBUTION_CONFIG | jq -r '.ETag')
+          CONFIG=$(echo $DISTRIBUTION_CONFIG | jq -r '.DistributionConfig')
+          UPDATED_CONFIG=$(echo $CONFIG | jq --arg ORIGIN_PATH "/${{ inputs.new_version }}" '.Origins.Items[0].OriginPath = $ORIGIN_PATH')
+          echo $UPDATED_CONFIG | jq '.' > updated-config.json
+          aws cloudfront update-distribution --id ${{ env.distribution_id }} --distribution-config file://updated-config.json --if-match $ETAG
+
+      - name: Create CloudFront invalidation
+        run: |
+          if [ -z "${{ env.distribution_id }}" ]; then
+            DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.s3_bucket }}.s3-website.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+          else
+            DISTRIBUTION_ID=${{ env.distribution_id }}
+          fi
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+
       # - name: Get S3 website URL and output
       #   id: get_s3_url
-      #   env: 
+      #   env:
       #     BUCKET_NAME: ${{ env.project_name }}-${{ inputs.environment }}-v3
       #     VERSION: ${{ inputs.new_version }}
       #     REGION: ${{ secrets.AWS_REGION }}
