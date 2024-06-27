@@ -101,7 +101,9 @@ jobs:
       - name: Check existing CloudFront distribution
         id: check_distribution
         run: |
-          EXISTING_DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.s3_bucket }}.s3-website.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
+          S3_WEBSITE_DOMAIN="$BUCKET_NAME.s3-website.${{ secrets.AWS_REGION }}.amazonaws.com"
+          EXISTING_DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='$S3_WEBSITE_DOMAIN']].Id" --output text)
           echo "distribution_id=$EXISTING_DISTRIBUTION_ID" >> $GITHUB_ENV
 
       - name: Create CloudFront distribution if it does not exist
@@ -184,8 +186,9 @@ jobs:
 
       - name: Create CloudFront invalidation
         run: |
+          S3_WEBSITE_DOMAIN="$BUCKET_NAME.s3-website.${{ secrets.AWS_REGION }}.amazonaws.com"
           if [ -z "${{ env.distribution_id }}" ]; then
-            DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='${{ inputs.s3_bucket }}.s3-website.${{ inputs.aws_region }}.amazonaws.com']].Id" --output text)
+            DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='$S3_WEBSITE_DOMAIN']].Id" --output text)
           else
             DISTRIBUTION_ID=${{ env.distribution_id }}
           fi
