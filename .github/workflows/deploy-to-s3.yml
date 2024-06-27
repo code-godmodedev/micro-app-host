@@ -107,7 +107,8 @@ jobs:
       - name: Create CloudFront distribution if it does not exist
         if: env.distribution_id == ''
         run: |
-          ORIGIN_ID="${{ inputs.s3_bucket }}-origin"
+          BUCKET_NAME="${{ env.project_name }}-${{ inputs.environment }}-v3"
+          ORIGIN_ID="$BUCKET_NAME-origin"
           ORIGIN_PATH="/${{ inputs.new_version }}"
           S3_WEBSITE_DOMAIN="$BUCKET_NAME.s3-website.${{ secrets.AWS_REGION }}.amazonaws.com"
           DISTRIBUTION_CONFIG=$(cat <<EOF
