@@ -1,3 +1,7 @@
+## Release 0.0.48
+S3 Website URL: https://dr8o9bmv4thdj.cloudfront.net/0.0.48/
+
+
 ## Release 0.0.45
 S3 Website URL: http://micro-app-host-development-v3.s3-website.ap-south-1.amazonaws.com/0.0.45/
 
