@@ -53,7 +53,7 @@ jobs:
             echo "Error: CloudFront distribution not found."
             exit 1
           fi
-          WEBSITE_URL="https://$CF_DOMAIN_NAME/$VERSION/"
+          WEBSITE_URL="http://$CF_DOMAIN_NAME/"
 
           echo "link=$WEBSITE_URL" >> $GITHUB_ENV
 
