@@ -1,3 +1,7 @@
+## Release 0.0.49
+S3 Website URL: http://dr8o9bmv4thdj.cloudfront.net/
+
+
 ## Release 0.0.48
 S3 Website URL: https://dr8o9bmv4thdj.cloudfront.net/0.0.48/
 
